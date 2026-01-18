@@ -1,0 +1,46 @@
+service: tower-of-hanoi-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${env:AWS_REGION, 'us-east-1'}
+  timeout: ${env:AWS_TIMEOUT, 30}
+  memorySize: ${env:AWS_MEMORY_SIZE, 256}
+  stage: ${env:STAGE, 'dev'}
+  environment:
+    NODE_ENV: ${env:NODE_ENV, 'production'}
+
+functions:
+  solve:
+    handler: src/handler.solve
+    events:
+      - http:
+          path: solve
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3001
+  serverless-plugin-typescript:
+    tsConfigFileLocation: './tsconfig.json'
+    exclude:
+      - 'dist/**'
+      - 'node_modules/**'
+  dotenv:
+    # Exclude AWS credentials from being passed to Lambda environment variables
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
