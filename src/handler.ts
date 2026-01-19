@@ -29,7 +29,6 @@ const HEADERS = {
 };
 
 export const solve = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -47,11 +46,10 @@ export const solve = async (event: APIGatewayProxyEvent): Promise<APIGatewayProx
         body: JSON.stringify({ error: 'Request body is required' }),
       };
     }
-
+    console.log('event.body', event.body);
     const requestBody: SolveRequest = JSON.parse(event.body);
     const { numberOfDisks } = requestBody;
 
-    // Input validation
     if (typeof numberOfDisks !== 'number' || numberOfDisks < 1) {
       return {
         statusCode: 400,
